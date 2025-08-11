@@ -53,6 +53,11 @@ lambda-package/
 *.crt
 *.cer
 
+# Sensitive OAuth files
+get-refresh-token.js
+get-token.js
+oauth.html
+
 # Local configuration files
 *.local
 
