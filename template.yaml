@@ -1,0 +1,88 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'Alexa Skill for Ana - Food and Restaurant Recommendations'
+
+Globals:
+  Function:
+    Timeout: 10
+    MemorySize: 512
+    Architectures:
+      - arm64
+    Runtime: nodejs20.x
+    Environment:
+      Variables:
+        PREFERENCES_TABLE_NAME: !Ref PreferencesTable
+        HISTORICAL_API_BASE: https://2kfsa0b68h.execute-api.us-west-2.amazonaws.com/prod/historical-dishes
+        RESTAURANT_API_BASE: https://4ccoyys838.execute-api.us-west-2.amazonaws.com/prod/restaurants
+        RECIPE_API_BASE: https://h5dyjlxrog.execute-api.us-west-2.amazonaws.com/prod/recipes
+        USE_BEDROCK_NLQ: 'false'
+        BEDROCK_MODEL_ID: anthropic.claude-3-haiku-20240307-v1:0
+
+Resources:
+  AnaSkillFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./
+      Handler: dist/app.handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PreferencesTable
+        - Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:InvokeModel
+                - bedrock:InvokeModelWithResponseStream
+              Resource:
+                - !Sub 'arn:aws:bedrock:${AWS::Region}::foundation-model/anthropic.claude-3-haiku-20240307-v1:0'
+                - !Sub 'arn:aws:bedrock:${AWS::Region}::foundation-model/anthropic.claude-v2'
+      Events:
+        SkillEvent:
+          Type: AlexaSkill
+          Properties:
+            SkillId: !Ref AlexaSkill
+
+  AlexaSkill:
+    Type: AWS::Alexa::ASK::Skill
+    Properties:
+      AuthenticationConfiguration:
+        ClientId: ${env:ALEXA_CLIENT_ID}
+        ClientSecret: ${env:ALEXA_CLIENT_SECRET}
+        RefreshToken: ${env:ALEXA_REFRESH_TOKEN}
+      VendorId: ${env:ALEXA_VENDOR_ID}
+      SkillManifest:
+        PublishingInformation:
+          Locales:
+            en-US:
+              Name: Ana
+              Summary: Food and restaurant recommendation skill
+              Description: Provides food and restaurant recommendations based on user preferences
+              ExamplePhrases:
+                - 'Alexa, ask Ana to recommend a dinner place'
+                - 'Alexa, ask Ana what should I have for lunch'
+                - 'Alexa, tell Ana to save my favorite dish'
+          Category: FOOD_AND_DRINK
+        Apis:
+          custom:
+            endpoint:
+              Uri: !GetAtt AnaSkillFunction.Arn
+        ManifestVersion: '1.0'
+
+  PreferencesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: AlexaUserPreferences
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+
+Outputs:
+  SkillFunctionArn:
+    Description: ARN of the Lambda function for the Alexa Skill
+    Value: !GetAtt AnaSkillFunction.Arn
+  SkillId:
+    Description: ID of the Alexa Skill
+    Value: !GetAtt AnaSkillFunction.Outputs.SkillId

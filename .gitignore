@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build output
+dist/
+coverage/
+
+# Environment variables
+.env
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Lambda deployment artifacts
+*.zip
+function.zip
+alexa-skill-deployment.zip
+ana-alexa-skill-deployment.zip
+ana-alexa-skill.zip
+
+# Local development
+.venv/
+
+# Logs
+logs
+*.log
+
+# Test artifacts
+coverage/
+.nyc_output/
+
+# AWS SAM
+.aws-sam/
+
+# Output files
+output.json
