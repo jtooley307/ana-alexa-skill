@@ -1,0 +1,334 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "meal advisor",
+      "modelConfiguration": {
+        "fallbackIntentSensitivity": {
+          "level": "LOW"
+        }
+      },
+      "intents": [
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.FallbackIntent",
+          "samples": []
+        },
+        {
+          "name": "NaturalLanguageQueryIntent",
+          "slots": [
+            {
+              "name": "query",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "find {query}",
+            "I want to find {query}",
+            "can you help me find {query}",
+            "how about finding {query}",
+            "what about finding {query}",
+            "I'd like to find {query}",
+            "I need to find {query}",
+            "recommend me {query}",
+            "suggest me {query}",
+            "search for {query}"
+          ]
+        },
+        {
+          "name": "RecommendDishIntent",
+          "slots": [
+            {
+              "name": "mealType",
+              "type": "MEAL_TYPE"
+            },
+            {
+              "name": "cuisine",
+              "type": "CUISINE_TYPE"
+            }
+          ],
+          "samples": [
+            "recommend a dish",
+            "suggest a meal",
+            "what should I eat for {mealType}",
+            "recommend a {mealType} dish",
+            "suggest a {cuisine} dish",
+            "what's a good {mealType} dish",
+            "recommend a {cuisine} {mealType} dish",
+            "what should I have for {mealType}",
+            "give me a meal recommendation",
+            "what's good to eat for {mealType}",
+            "recommend me a dish",
+            "suggest something to eat"
+          ]
+        },
+        {
+          "name": "RecommendMealIntent",
+          "slots": [
+            {
+              "name": "mealTime",
+              "type": "MEAL_TYPE"
+            },
+            {
+              "name": "cuisine",
+              "type": "CUISINE_TYPE"
+            }
+          ],
+          "samples": [
+            "recommend a meal",
+            "suggest a meal",
+            "what should I eat for {mealTime}",
+            "recommend a {mealTime} meal",
+            "suggest a {cuisine} meal",
+            "what's a good {mealTime} meal",
+            "recommend a {cuisine} {mealTime} meal",
+            "what should I have for {mealTime}",
+            "give me a meal recommendation",
+            "what's good to eat for {mealTime}",
+            "recommend me a meal",
+            "suggest something to eat"
+          ]
+        },
+        {
+          "name": "RecommendRestaurantIntent",
+          "slots": [
+            {
+              "name": "city",
+              "type": "AMAZON.US_CITY"
+            },
+            {
+              "name": "cuisine",
+              "type": "CUISINE_TYPE"
+            }
+          ],
+          "samples": [
+            "recommend a restaurant",
+            "find me a place to eat",
+            "suggest a restaurant in {city}",
+            "recommend a {cuisine} restaurant",
+            "find a {cuisine} place in {city}",
+            "what's a good restaurant in {city}",
+            "recommend a restaurant near me",
+            "where should I eat in {city}",
+            "suggest a good place to eat",
+            "find me a {cuisine} restaurant"
+          ]
+        },
+        {
+          "name": "SaveFavoriteDishIntent",
+          "slots": [
+            {
+              "name": "dishName",
+              "type": "DISH_NAME"
+            }
+          ],
+          "samples": [
+            "save {dishName} as my favorite dish",
+            "my favorite dish is {dishName}",
+            "remember I like {dishName}",
+            "I love {dishName}",
+            "add {dishName} to my favorites",
+            "save {dishName} to my favorites",
+            "{dishName} is my favorite dish",
+            "I want to save {dishName} as my favorite",
+            "remember that I like {dishName}",
+            "add {dishName} to my favorite dishes"
+          ]
+        },
+        {
+          "name": "SavePreferredMealTypeIntent",
+          "slots": [
+            {
+              "name": "mealType",
+              "type": "MEAL_TYPE"
+            }
+          ],
+          "samples": [
+            "I usually eat {mealType}",
+            "prefer {mealType} meals",
+            "I'm a {mealType} person",
+            "I prefer {mealType} food",
+            "set my preferred meal to {mealType}",
+            "I usually have {mealType}",
+            "my favorite meal is {mealType}",
+            "I like {mealType} the most",
+            "save {mealType} as my preferred meal",
+            "I'm more of a {mealType} person"
+          ]
+        },
+        {
+          "name": "SaveFavoriteRestaurantIntent",
+          "slots": [
+            {
+              "name": "restaurantName",
+              "type": "RESTAURANT_TYPE"
+            }
+          ],
+          "samples": [
+            "save {restaurantName} as my favorite restaurant",
+            "my favorite restaurant is {restaurantName}",
+            "remember I like {restaurantName}",
+            "I love {restaurantName}",
+            "add {restaurantName} to my favorites",
+            "save {restaurantName} to my favorite restaurants",
+            "{restaurantName} is my favorite restaurant",
+            "I want to save {restaurantName} as my favorite",
+            "remember that I like {restaurantName}",
+            "add {restaurantName} to my favorite restaurants"
+          ]
+        },
+        {
+          "name": "GetPreferencesIntent",
+          "samples": [
+            "what are my preferences",
+            "what do you know about me",
+            "what are my saved preferences",
+            "tell me my preferences",
+            "what are my favorite things",
+            "what do I like",
+            "show me my preferences",
+            "what are my saved favorites",
+            "what do you know about my preferences",
+            "list my preferences"
+          ]
+        }
+      ],
+      "types": [
+        {
+          "name": "MEAL_TYPE",
+          "values": [
+            {
+              "name": {
+                "value": "breakfast"
+              }
+            },
+            {
+              "name": {
+                "value": "lunch"
+              }
+            },
+            {
+              "name": {
+                "value": "dinner"
+              }
+            },
+            {
+              "name": {
+                "value": "brunch"
+              }
+            },
+            {
+              "name": {
+                "value": "snack"
+              }
+            }
+          ]
+        },
+        {
+          "name": "CUISINE_TYPE",
+          "values": [
+            { "name": { "value": "american" } },
+            { "name": { "value": "italian" } },
+            { "name": { "value": "mexican" } },
+            { "name": { "value": "chinese" } },
+            { "name": { "value": "japanese" } },
+            { "name": { "value": "indian" } },
+            { "name": { "value": "thai" } },
+            { "name": { "value": "french" } },
+            { "name": { "value": "mediterranean" } },
+            { "name": { "value": "greek" } },
+            { "name": { "value": "spanish" } },
+            { "name": { "value": "vietnamese" } },
+            { "name": { "value": "korean" } },
+            { "name": { "value": "brazilian" } },
+            { "name": { "value": "caribbean" } }
+          ]
+        },
+        {
+          "name": "RESTAURANT_TYPE",
+          "values": [
+            { "name": { "value": "Olive Garden" } },
+            { "name": { "value": "McDonald's" } },
+            { "name": { "value": "Starbucks" } },
+            { "name": { "value": "Chipotle" } },
+            { "name": { "value": "Panera Bread" } },
+            { "name": { "value": "The Cheesecake Factory" } },
+            { "name": { "value": "P.F. Chang's" } },
+            { "name": { "value": "Red Lobster" } },
+            { "name": { "value": "Applebee's" } },
+            { "name": { "value": "TGI Fridays" } }
+          ]
+        },
+        {
+          "name": "DISH_NAME",
+          "values": [
+            {
+              "name": {
+                "value": "pizza"
+              }
+            },
+            {
+              "name": {
+                "value": "pasta"
+              }
+            },
+            {
+              "name": {
+                "value": "burger"
+              }
+            },
+            {
+              "name": {
+                "value": "sushi"
+              }
+            },
+            {
+              "name": {
+                "value": "salad"
+              }
+            },
+            {
+              "name": {
+                "value": "steak"
+              }
+            },
+            {
+              "name": {
+                "value": "sandwich"
+              }
+            },
+            {
+              "name": {
+                "value": "tacos"
+              }
+            },
+            {
+              "name": {
+                "value": "ramen"
+              }
+            },
+            {
+              "name": {
+                "value": "curry"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,81 @@
+name: Ana Alexa Skill CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  AWS_REGION: us-west-2
+  PREFERENCES_TABLE_NAME: AlexaUserPreferences
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Use Node.js 20.x
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run tests
+      run: npm test
+      env:
+        NODE_ENV: test
+
+  build-and-deploy:
+    name: Build and Deploy
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Use Node.js 20.x
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+    
+    - name: Install AWS SAM CLI
+      uses: aws-actions/setup-sam@v2
+    
+    - name: Build with SAM
+      run: |
+        sam build --use-container
+        sam package --output-template-file packaged.yaml \
+                   --s3-bucket ${{ secrets.S3_BUCKET_NAME }} \
+                   --region ${{ env.AWS_REGION }}
+    
+    - name: Deploy with SAM
+      run: |
+        sam deploy --template-file packaged.yaml \
+                  --stack-name ana-alexa-skill-stack \
+                  --capabilities CAPABILITY_IAM \
+                  --region ${{ env.AWS_REGION }} \
+                  --no-fail-on-empty-changeset
+      env:
+        HISTORICAL_API_BASE: ${{ secrets.HISTORICAL_API_BASE }}
+        RESTAURANT_API_BASE: ${{ secrets.RESTAURANT_API_BASE }}
+        RECIPE_API_BASE: ${{ secrets.RECIPE_API_BASE }}
+        USE_BEDROCK_NLQ: ${{ secrets.USE_BEDROCK_NLQ || 'false' }}
