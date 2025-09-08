@@ -67,10 +67,14 @@ async function deploySkill(): Promise<void> {
       fs.mkdirSync(SKILL_PACKAGE_DIR, { recursive: true });
     }
     
+    // Ensure interaction model directory exists
+    const interactionModelDir = path.join(SKILL_PACKAGE_DIR, 'interactionModels', 'custom');
+    fs.mkdirSync(interactionModelDir, { recursive: true });
+
     // Copy interaction model
     fs.copyFileSync(
       path.join(MODELS_DIR, 'en-US.json'),
-      path.join(SKILL_PACKAGE_DIR, 'interactionModels/custom/en-US.json')
+      path.join(interactionModelDir, 'en-US.json')
     );
     
     // Create skill manifest
@@ -107,15 +111,14 @@ async function deploySkill(): Promise<void> {
       }
     };
     
-    // Save manifest
-    fs.mkdirSync(path.join(SKILL_PACKAGE_DIR, 'skill.json'), { recursive: true });
-    fs.writeFileSync(
-      path.join(SKILL_PACKAGE_DIR, 'skill.json'),
-      JSON.stringify(manifest, null, 2)
-    );
+    // Save manifest (ensure package dir exists and write file)
+    fs.mkdirSync(SKILL_PACKAGE_DIR, { recursive: true });
+    const manifestPath = path.join(SKILL_PACKAGE_DIR, 'skill.json');
+    fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
+    console.log(`Wrote manifest to: ${manifestPath}`);
     
     // Deploy the skill
-    const deployCmd = `ask deploy --target skill --force`;
+    const deployCmd = `ask deploy --target skill`;
     execSync(deployCmd, { stdio: 'inherit' });
     
     console.log('Skill deployment completed successfully!');

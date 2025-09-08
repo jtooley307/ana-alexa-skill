@@ -1,0 +1,44 @@
+{
+  "manifest": {
+    "publishingInformation": {
+      "locales": {
+        "en-US": {
+          "name": "Meal Advisor",
+          "summary": "A skill that recommends meals and restaurants",
+          "description": "Get personalized meal and restaurant recommendations based on your preferences.",
+          "examplePhrases": [
+            "Alexa, open Meal Advisor",
+            "Alexa, ask Meal Advisor to recommend a dish",
+            "Alexa, tell Meal Advisor to find me an Italian restaurant"
+          ],
+          "keywords": [
+            "food",
+            "restaurant",
+            "meal",
+            "recipe",
+            "recommendation"
+          ]
+        }
+      },
+      "isAvailableWorldwide": true,
+      "testingInstructions": "Test the skill by asking for meal recommendations or saving preferences.",
+      "category": "FOOD_AND_DRINK",
+      "distributionCountries": []
+    },
+    "apis": {
+      "custom": {}
+    },
+    "manifestVersion": "1.0",
+    "permissions": [
+      {
+        "name": "alexa::profile:email:read"
+      },
+      {
+        "name": "alexa::profile:name:read"
+      },
+      {
+        "name": "alexa::devices:all:geolocation:address"
+      }
+    ]
+  }
+}

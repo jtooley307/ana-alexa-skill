@@ -14,7 +14,9 @@ Globals:
         PREFERENCES_TABLE_NAME: !Ref PreferencesTable
         HISTORICAL_API_BASE: https://2kfsa0b68h.execute-api.us-west-2.amazonaws.com/prod/historical-dishes
         RESTAURANT_API_BASE: https://4ccoyys838.execute-api.us-west-2.amazonaws.com/prod/restaurants
-        RECIPE_API_BASE: https://h5dyjlxrog.execute-api.us-west-2.amazonaws.com/prod/recipes
+        RECIPES_API_BASE: https://h5dyjlxrog.execute-api.us-west-2.amazonaws.com/prod/recipes
+        MEALS_API_BASE: https://7ots4tpdj1.execute-api.us-west-2.amazonaws.com/prod/meals
+        API_TIMEOUT_MS: 10000
         USE_BEDROCK_NLQ: 'false'
         BEDROCK_MODEL_ID: anthropic.claude-3-haiku-20240307-v1:0
 

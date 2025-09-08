@@ -6,7 +6,7 @@ const logger = createLogger('api-client');
 
 // Default timeout in milliseconds
 const DEFAULT_TIMEOUT = 5000; // 5 seconds
-const MAX_RETRIES = 2;
+const ENV_MAX_RETRIES = parseInt(process.env.API_MAX_RETRIES || '1', 10);
 
 interface ApiConfig {
   baseUrl: string;
@@ -21,14 +21,33 @@ export interface HistoricalDishParams {
 }
 
 export interface RestaurantParams {
+  // Preferred key per Restaurant API spec
+  dish?: string;
+  // Alias maintained for backward compatibility
   query?: string;
   location?: string;
   limit?: number;
+  use_bedrock?: string | boolean;
 }
 
 export interface RecipeParams {
-  dish: string;
+  dish?: string;
+  // Alias supported by Recipe API
+  dish_name?: string;
   limit?: number;
+  // Additional params per API spec
+  dish_id?: number | string;
+  dishId?: number | string;
+  recipe_id?: string;
+  recipeId?: string;
+  action?: string; // e.g., 'describe'
+}
+
+export interface MealsParams {
+  query: string;
+  limit?: number; // 1-10
+  cuisine?: string;
+  meal_type?: string; // breakfast|lunch|dinner|brunch|snack
 }
 
 export interface ApiResponse<T> {
@@ -43,6 +62,7 @@ export class ApiClient {
   private historicalDishesConfig: Required<ApiConfig>;
   private restaurantsConfig: Required<ApiConfig>;
   private recipesConfig: Required<ApiConfig>;
+  private mealsConfig: Required<ApiConfig>;
 
   constructor() {
     this.historicalDishesConfig = {
@@ -57,6 +77,11 @@ export class ApiClient {
     
     this.recipesConfig = {
       baseUrl: (process.env.RECIPES_API_BASE || 'https://api.example.com/recipes').trim(),
+      timeout: parseInt(process.env.API_TIMEOUT_MS || DEFAULT_TIMEOUT.toString(), 10)
+    };
+
+    this.mealsConfig = {
+      baseUrl: (process.env.MEALS_API_BASE || 'https://7ots4tpdj1.execute-api.us-west-2.amazonaws.com/prod/meals').trim(),
       timeout: parseInt(process.env.API_TIMEOUT_MS || DEFAULT_TIMEOUT.toString(), 10)
     };
   }
@@ -76,13 +101,50 @@ export class ApiClient {
     return this.makeRequest(url);
   }
 
+  public async describeRecipe(recipeId: string): Promise<ApiResponse<any>> {
+    const url = this.buildUrl(this.recipesConfig.baseUrl, { action: 'describe', recipe_id: recipeId });
+    return this.makeRequest(url);
+  }
+
+  // Try fetching a single recipe by ID. First attempt path style /:id, then query param ?id=
+  public async getRecipeById(id: string): Promise<ApiResponse<any>> {
+    const base = this.recipesConfig.baseUrl.replace(/\/$/, '');
+    // Attempt 1: /recipes/{id}
+    let url = `${base}/${encodeURIComponent(id)}`;
+    let resp = await this.makeRequest(url);
+    if (resp?.data) return resp;
+    // Attempt 2: /recipes?id={id}
+    url = this.buildUrl(this.recipesConfig.baseUrl, { id });
+    return this.makeRequest(url);
+  }
+
+  public async postMeals(params: MealsParams): Promise<ApiResponse<any>> {
+    const url = this.mealsConfig.baseUrl; // POST expects JSON body
+    return this.makeRequest(url, {
+      method: 'POST',
+      body: JSON.stringify(params)
+    });
+  }
+
+  private getTimeoutForUrl(url: string): number {
+    try {
+      if (url.startsWith(this.historicalDishesConfig.baseUrl)) return this.historicalDishesConfig.timeout;
+      if (url.startsWith(this.restaurantsConfig.baseUrl)) return this.restaurantsConfig.timeout;
+      if (url.startsWith(this.recipesConfig.baseUrl)) return this.recipesConfig.timeout;
+      if (url.startsWith(this.mealsConfig.baseUrl)) return this.mealsConfig.timeout;
+    } catch (_) {
+      // noop
+    }
+    return parseInt(process.env.API_TIMEOUT_MS || DEFAULT_TIMEOUT.toString(), 10);
+  }
+
   private async makeRequest<T>(
-    url: string, 
+    url: string,
     options: any = {},
     retryCount = 0
   ): Promise<ApiResponse<T>> {
     const controller = new AbortController();
-    const timeoutMs = this.historicalDishesConfig.timeout;
+    const timeoutMs = this.getTimeoutForUrl(url);
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
     try {
@@ -116,7 +178,7 @@ export class ApiClient {
       clearTimeout(timeoutId);
       
       const errorMessage = error instanceof Error ? error.message : 'Unknown API error';
-      const shouldRetry = this.shouldRetry(error) && retryCount < MAX_RETRIES;
+      const shouldRetry = this.shouldRetry(error) && retryCount < ENV_MAX_RETRIES;
       
       // Log error details
       const errorContext = {

@@ -1,6 +1,7 @@
 import { HandlerInput, RequestHandler } from 'ask-sdk-core';
 import { Response } from 'ask-sdk-model';
 import { BaseHandler } from '../handlers/BaseHandler';
+import { RecommendDishIntentHandler } from './RecommendDishIntent';
 import { preferencesService } from '../services/PreferencesService';
 import { createLogger } from '../utils/logger';
 
@@ -31,6 +32,37 @@ export class SaveFavoriteDishIntentHandler extends BaseHandler {
       
       const slots = request.intent.slots || {};
       const dishName = slots.dishName?.value;
+
+      // If we're in a clarification flow awaiting a dish preference, do not save favorites.
+      const sessionAttrs = handlerInput.attributesManager.getSessionAttributes() || {};
+      if (sessionAttrs.awaitingDishPreference && dishName) {
+        logger.info('Intercepting SaveFavoriteDishIntent during clarification; delegating to RecommendDishIntent instead', { dishName });
+        const intentRequest = {
+          ...handlerInput.requestEnvelope.request,
+          type: 'IntentRequest',
+          intent: {
+            name: 'RecommendDishIntent',
+            confirmationStatus: 'NONE',
+            slots: {
+              dishName: {
+                name: 'dishName',
+                value: dishName,
+                confirmationStatus: 'NONE',
+                source: 'USER',
+                slotValue: { type: 'Simple', value: dishName }
+              }
+            }
+          }
+        } as any;
+        const newHandlerInput = {
+          ...handlerInput,
+          requestEnvelope: {
+            ...handlerInput.requestEnvelope,
+            request: intentRequest
+          }
+        } as any;
+        return new RecommendDishIntentHandler().handle(newHandlerInput);
+      }
       
       if (!dishName) {
         return this.handleNoDishName(handlerInput);

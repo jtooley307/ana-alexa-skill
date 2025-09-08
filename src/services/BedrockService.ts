@@ -31,8 +31,8 @@ export class BedrockService {
     this.config = {
       region: process.env.AWS_REGION || 'us-west-2',
       modelId: 'anthropic.claude-3-haiku-20240307-v1:0',
-      maxTokens: 1000,
-      temperature: 0.2,
+      maxTokens: 48,
+      temperature: 0.0,
       topP: 0.9,
       stopSequences: []
     };
@@ -70,7 +70,12 @@ export class BedrockService {
       logger.info(`[BedrockService] BedrockRuntimeClient created successfully`);
 
       const prompt = this.buildPrompt(query);
-      const response = await this.invokeModel(prompt);
+      // Soft timeout: if Bedrock takes too long, fall back gracefully
+      const softTimeoutMs = 900;
+      const response = await Promise.race<string>([
+        this.invokeModel(prompt),
+        new Promise<string>((_resolve, reject) => setTimeout(() => reject(new Error('Bedrock soft timeout exceeded')), softTimeoutMs))
+      ]);
       
       logger.info(`[BedrockService] Received response from Bedrock`, { 
         response: response,

@@ -10,7 +10,7 @@ export const normalizeDishName = (name: string): string => {
   const wordsToRemove = [
     'recipe', 'dish', 'meal', 'dinner', 'lunch', 'breakfast', 
     'food', 'cuisine', 'style', 'type', 'flavor', 'taste',
-    'cooked', 'baked', 'fried', 'grilled', 'roasted', 'steamed',
+    // Preserve cooking method adjectives (e.g., fried/grilled/roasted/steamed/baked/cooked)
     'the', 'a', 'an', 'my', 'some', 'any', 'all', 'of', 'with',
     'and', 'or', 'for', 'in', 'on', 'at', 'to', 'from', 'by'
   ];

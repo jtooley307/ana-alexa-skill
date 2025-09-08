@@ -1,17 +1,13 @@
 {
   "interactionModel": {
     "languageModel": {
-      "invocationName": "historic meal planner",
+      "invocationName": "meal advisor",
       "modelConfiguration": {
         "fallbackIntentSensitivity": {
           "level": "LOW"
         }
       },
       "intents": [
-        {
-          "name": "AMAZON.NextIntent",
-          "samples": []
-        },
         {
           "name": "AMAZON.CancelIntent",
           "samples": []
@@ -63,10 +59,6 @@
             {
               "name": "cuisine",
               "type": "CUISINE_TYPE"
-            },
-            {
-              "name": "dishName",
-              "type": "DISH_NAME"
             }
           ],
           "samples": [
@@ -81,13 +73,7 @@
             "give me a meal recommendation",
             "what's good to eat for {mealType}",
             "recommend me a dish",
-            "suggest something to eat",
-            "{dishName} for {mealType}",
-            "recommend {dishName}",
-            "recommend a {dishName} dish",
-            "recommend {dishName} for {mealType}",
-            "recommend a {dishName} meal",
-            "recommend {dishName}"
+            "suggest something to eat"
           ]
         },
         {
@@ -127,10 +113,6 @@
             {
               "name": "cuisine",
               "type": "CUISINE_TYPE"
-            },
-            {
-              "name": "dishName",
-              "type": "DISH_NAME"
             }
           ],
           "samples": [
@@ -143,15 +125,7 @@
             "recommend a restaurant near me",
             "where should I eat in {city}",
             "suggest a good place to eat",
-            "find me a {cuisine} restaurant",
-            "find a restaurant for {dishName}",
-            "find a place that serves {dishName}",
-            "recommend a restaurant for {dishName}",
-            "where can I eat {dishName}",
-            "what restaurant serves {dishName}",
-            "find {dishName} near me",
-            "where can I get {dishName} near me",
-            "find a {cuisine} place for {dishName}"
+            "find me a {cuisine} restaurant"
           ]
         },
         {
@@ -165,10 +139,13 @@
           "samples": [
             "save {dishName} as my favorite dish",
             "my favorite dish is {dishName}",
+            "remember I like {dishName}",
+            "I love {dishName}",
             "add {dishName} to my favorites",
             "save {dishName} to my favorites",
             "{dishName} is my favorite dish",
             "I want to save {dishName} as my favorite",
+            "remember that I like {dishName}",
             "add {dishName} to my favorite dishes"
           ]
         },
@@ -258,32 +235,6 @@
             "I want the recipe for {dishName}",
             "can you give me the recipe for {dishName}",
             "how do I prepare {dishName}"
-          ]
-        },
-        {
-          "name": "NextRestaurantIntent",
-          "samples": [
-            "next",
-            "next restaurant",
-            "another restaurant",
-            "give me another option",
-            "another option",
-            "give me the next restaurant",
-            "read me the next restaurant",
-            "next option",
-            "another restaurant option"
-          ]
-        },
-        {
-          "name": "NextRecipeIntent",
-          "samples": [
-            "next recipe",
-            "another recipe",
-            "show me another recipe",
-            "give me another recipe",
-            "read me the next recipe",
-            "next recipe option",
-            "another recipe option"
           ]
         }
       ],

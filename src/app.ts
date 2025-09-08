@@ -14,6 +14,11 @@ import { SaveFavoriteDishIntentHandler } from './intents/SaveFavoriteDishIntent'
 import { SavePreferredMealTypeIntentHandler } from './intents/SavePreferredMealTypeIntent';
 import { SaveFavoriteRestaurantIntentHandler } from './intents/SaveFavoriteRestaurantIntent';
 import { NaturalLanguageQueryIntentHandler } from './intents/NaturalLanguageQueryIntent';
+import { GetRecipeIntentHandler } from './intents/GetRecipeIntent';
+import { GetPreferencesIntentHandler } from './intents/GetPreferencesIntent';
+import { NextRestaurantIntentHandler } from './intents/NextRestaurantIntent';
+import { NextRecipeIntentHandler } from './intents/NextRecipeIntent';
+import { NextOptionIntentHandler } from './intents/NextOptionIntent';
 
 const tableName = process.env.PREFERENCES_TABLE_NAME || 'AlexaUserPreferences';
 const isDevelopment = process.env.ENV === 'development';
@@ -31,6 +36,11 @@ const skillBuilder = SkillBuilders.custom()
     new RecommendDishIntentHandler(),
     new RecommendMealIntentHandler(),
     new RecommendRestaurantIntentHandler(),
+    new GetRecipeIntentHandler(),
+    new GetPreferencesIntentHandler(),
+    new NextRestaurantIntentHandler(),
+    new NextRecipeIntentHandler(),
+    new NextOptionIntentHandler(),
     new SaveFavoriteDishIntentHandler(),
     new SavePreferredMealTypeIntentHandler(),
     new SaveFavoriteRestaurantIntentHandler(),

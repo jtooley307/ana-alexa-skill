@@ -1,7 +1,8 @@
-import { HandlerInput, RequestHandler } from 'ask-sdk-core';
-import { Response } from 'ask-sdk-model';
+import { HandlerInput } from 'ask-sdk-core';
+import { Response, IntentRequest } from 'ask-sdk-model';
 import { BaseHandler } from '../handlers/BaseHandler';
 import { nlqRouter } from '../services/NLQRouter';
+import { extractDishName } from '../utils/stringUtils';
 import { RecommendDishIntentHandler } from './RecommendDishIntent';
 import { RecommendMealIntentHandler } from './RecommendMealIntent';
 import { RecommendRestaurantIntentHandler } from './RecommendRestaurantIntent';
@@ -24,7 +25,7 @@ export class NaturalLanguageQueryIntentHandler extends BaseHandler {
     this.logRequest(handlerInput, 'Handling NaturalLanguageQueryIntent');
     
     try {
-      const { slots } = handlerInput.requestEnvelope.request.intent;
+      const { slots } = (handlerInput.requestEnvelope.request as IntentRequest).intent;
       const query = slots?.query?.value;
       
       if (!query) {
@@ -32,8 +33,30 @@ export class NaturalLanguageQueryIntentHandler extends BaseHandler {
       }
       
       logger.info('Processing natural language query', { query });
-      
-      // Route the query to the appropriate handler
+
+      // Fast-path A: detect simple cuisine + meal phrases (e.g., "italian dinner")
+      const qLower = query.toLowerCase();
+      const cuisines = [
+        'american','italian','mexican','chinese','japanese','indian','thai','french','mediterranean','greek','spanish','vietnamese','korean','brazilian','caribbean'
+      ];
+      const meals: Array<'breakfast'|'lunch'|'dinner'|'brunch'|'snack'> = ['breakfast','lunch','dinner','brunch','snack'];
+      const foundCuisine = cuisines.find(c => new RegExp(`\\b${c}\\b`).test(qLower));
+      const foundMeal = meals.find(m => new RegExp(`\\b${m}\\b`).test(qLower));
+
+      if (foundCuisine && foundMeal) {
+        logger.info('NLQ fast-path matched cuisine+meal; delegating without Bedrock', { foundCuisine, foundMeal });
+        return this.delegateToMealIntent(handlerInput, { cuisine: foundCuisine, mealType: foundMeal });
+      }
+
+      // Fast-path B: try local extraction for simple dish queries to avoid Bedrock roundtrip
+      const localDish = extractDishName(query);
+      const looksDishy = localDish && localDish.replace(/\s+/g, '').length >= 2; // non-trivial
+      if (looksDishy) {
+        logger.info('NLQ fast-path matched dish locally; delegating without Bedrock', { localDish });
+        return this.delegateToDishIntent(handlerInput, { dishName: localDish });
+      }
+
+      // Otherwise, route via NLQ (Bedrock)
       const result = await nlqRouter.processQuery(query, handlerInput);
       
       logger.debug('NLQ processing result', { result });
